@@ -33,6 +33,14 @@ namespace ProfiledApplication
     {        
     }
 
+    class F
+    {
+        public F(A a)
+        {
+            
+        }
+    }
+
     class Program
     {
         static void Main()
@@ -69,6 +77,12 @@ namespace ProfiledApplication
                     var ov = ls2.Resolve<Owned<C>>();
                     Console.WriteLine("Resolved an {0}", ov);
                 }
+
+                using (var ls3 = container.BeginLifetimeScope("service", x => x.RegisterType<F>()))
+                {
+                    var f = ls3.Resolve<F>();
+                    Console.WriteLine("Resolved a {0}.", f);
+                }        
             }
 
             Console.WriteLine("Done. Press any key...");
