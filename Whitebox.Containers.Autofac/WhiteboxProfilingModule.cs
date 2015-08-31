@@ -29,6 +29,7 @@ namespace Whitebox.Containers.Autofac
         {
             base.Load(builder);
             builder.RegisterInstance(this)
+                .As<WhiteboxProfilingModule>()
                 .As<IStartable>()
                 .OnActivated(e => e.Instance.Start(e.Context.Resolve<ILifetimeScope>()));
 
@@ -117,6 +118,8 @@ namespace Whitebox.Containers.Autofac
         {
             _client.Enqueue(message);
         }
+
+        internal IWriteQueue Queue { get { return _client; } }
 
         internal ModelMapper ModelMapper { get { return _modelMapper; } }
     }

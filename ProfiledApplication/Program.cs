@@ -2,6 +2,7 @@
 using Autofac;
 using Autofac.Configuration;
 using Autofac.Features.OwnedInstances;
+using Whitebox.Containers.Autofac;
 
 namespace ProfiledApplication
 {
@@ -48,6 +49,7 @@ namespace ProfiledApplication
             Console.WriteLine("Started.");
 
             var builder = new ContainerBuilder();
+            //builder.RegisterModule<WhiteboxProfilingModule>();
             builder.RegisterModule(new ConfigurationSettingsReader());
             builder.RegisterType<A>().SingleInstance();
             builder.RegisterType<B>().PropertiesAutowired(PropertyWiringOptions.AllowCircularDependencies);
@@ -78,7 +80,12 @@ namespace ProfiledApplication
                     Console.WriteLine("Resolved an {0}", ov);
                 }
 
-                using (var ls3 = container.BeginLifetimeScope("service", x => x.RegisterType<F>()))
+                using (var ls3 = container.BeginLifetimeScope("service", x =>
+                {
+                    var childModule = new ChildScopePipingProfilingModule(container.Resolve<WhiteboxProfilingModule>());
+                    x.RegisterModule(childModule);
+                    x.RegisterType<F>();
+                }))
                 {
                     var f = ls3.Resolve<F>();
                     Console.WriteLine("Resolved a {0}.", f);
